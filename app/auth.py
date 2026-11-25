@@ -1,47 +1,77 @@
 from datetime import UTC, datetime, timedelta
+from uuid import UUID
+
 import jwt
-from fastapi.security import OAuth2PasswordBearer
 from pwdlib import PasswordHash
+from pwdlib.exceptions import UnknownHashError
 
 from app.core.config import settings
 
+
 password_hash = PasswordHash.recommended()
 
-oauth2_schema = OAuth2PasswordBearer(tokenUrl="api/users/token")
 
-def hash_password(password=str) -> str:
+def hash_password(password: str) -> str:
     return password_hash.hash(password)
 
-def verify_password(plain_password:str, hash_password:str) -> bool:
-    return password_hash.verify(plain_password,hash_password)
 
-def create_access_token(data:dict, expires_delta:timedelta |None) -> str:
-    """ create jwd access token """
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(UTC) + expires_delta
-    else:
-        expire = datetime.now(UTC) + timedelta(
-            minutes=settings.access_token_expire_minutes,
+def verify_password(
+    plain_password: str,
+    hashed_password: str,
+) -> bool:
+    try:
+        return password_hash.verify(
+            plain_password,
+            hashed_password,
         )
-    to_encode.update({"exp": expire})
-    encoded_jwd = jwt.encode(
+    except UnknownHashError:
+        return False
+
+
+def create_access_token(
+    data: dict,
+    expires_delta: timedelta | None = None,
+) -> str:
+
+    to_encode = data.copy()
+    now = datetime.now(UTC)
+    expire = now + (
+        expires_delta
+        if expires_delta is not None
+        else timedelta(
+            minutes=settings.access_token_expire_minutes
+        )
+    )
+
+    to_encode.update({
+        "iat": now,
+        "exp": expire,
+        "type": "access",
+    })
+
+    return jwt.encode(
         to_encode,
         settings.secret_key.get_secret_value(),
         algorithm=settings.algorithm,
     )
-    return encoded_jwd
 
-def verify_access_token(token:str) -> str|None:
-    """ verifica el token y retorna user valid """
+
+def verify_access_token(token: str) -> UUID | None:
+
     try:
         payload = jwt.decode(
             token,
             settings.secret_key.get_secret_value(),
             algorithms=[settings.algorithm],
-            options={"require":  ["exp", "sub"]},
+            options={
+                "require": ["exp", "sub", "iat", "type"]
+            },
         )
-    except jwt.InvalidTokenError:
+
+        if payload["type"] != "access":
+            return None
+
+        return UUID(payload["sub"])
+
+    except (jwt.InvalidTokenError, ValueError, TypeError):
         return None
-    else:
-        return payload.get("sub")

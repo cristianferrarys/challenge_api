@@ -8,7 +8,13 @@ from app.repositories.user_repository import UserRepository
 from app.repositories.user_repository_impl import UserRepositoryImpl
 from app.services.user_service import UserService
 from app.services.user_service_impl import UserServiceImpl
-
+"""auth"""
+from fastapi.security import OAuth2PasswordBearer
+from app.services.auth_service import AuthService
+from app.services.auth_service_impl import AuthServiceImpl
+from app.core.database import SessionLocal
+from app.models.user import User
+"""auth"""
 
 def get_user_repository(
     session: Annotated[AsyncSession, Depends(get_db)],
@@ -30,3 +36,37 @@ def get_user_service(
         repository=repository,
         session=session,
     )
+
+
+
+oauth2_schema = OAuth2PasswordBearer(
+    tokenUrl="auth/token"
+)
+
+def get_auth_service(
+    repository: Annotated[
+        UserRepository,
+        Depends(get_user_repository),
+    ],
+) -> AuthService:
+
+    return AuthServiceImpl(
+        repository=repository
+    )
+
+
+async def get_current_user(
+    token: Annotated[
+        str,
+        Depends(oauth2_schema),
+    ],
+) -> User:
+
+    async with SessionLocal() as session:
+
+        repository = UserRepositoryImpl(session)
+
+        service = AuthServiceImpl(repository)
+
+        return await service.get_current_user(token)
+

@@ -3,3 +3,9 @@ class UserNotFoundError(Exception):
 
 class UserAlreadyExistsError(Exception):
     pass
+
+class InvalidCredentialsError(Exception):
+    pass
+
+class InvalidAccessTokenError(Exception):
+    pass
