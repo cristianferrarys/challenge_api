@@ -27,3 +27,8 @@ class User(Base):
         index=True,
         nullable=False,
     )
+
+    password: Mapped[str] = mapped_column(
+        String(200),
+        nullable=False,
+    )
