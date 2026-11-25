@@ -1,0 +1,12 @@
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/hola")
+def hola():
+    return {"menssage": "hola mundo "}
+
+
+
+
