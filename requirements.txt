@@ -4,3 +4,5 @@ sqlalchemy[asyncio]>=2.0,<3.0
 asyncpg
 pydantic-settings
 email-validator
+pwdlib[argon2]
+pyjwt

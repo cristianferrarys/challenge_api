@@ -9,8 +9,10 @@ from app.core.exceptions import (
 )
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserUpdate,Token
 from app.services.user_service import UserService
+
+from app.auth import hash_password
 
 
 class UserServiceImpl(UserService):
@@ -38,7 +40,7 @@ class UserServiceImpl(UserService):
                 user = User(
                     name=data.name,
                     email=data.email,
-                    password=data.password
+                    password=hash_password(data.password)
                 )
 
                 await self.repository.save(user)
