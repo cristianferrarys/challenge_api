@@ -5,7 +5,7 @@ from pydantic import SecretStr
 class Settings(BaseSettings):
     DATABASE_URL: str
 
-    secret_key = SecretStr
+    secret_key: SecretStr
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
 

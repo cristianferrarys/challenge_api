@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from uuid import UUID
 
 import jwt
@@ -34,7 +34,7 @@ def create_access_token(
 ) -> str:
 
     to_encode = data.copy()
-    now = datetime.now(UTC)
+    now = datetime.now(timezone.utc)
     expire = now + (
         expires_delta
         if expires_delta is not None

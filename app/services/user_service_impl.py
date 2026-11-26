@@ -3,6 +3,8 @@ from uuid import UUID
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from starlette.concurrency import run_in_threadpool
+
 from app.core.exceptions import (
     UserAlreadyExistsError,
     UserNotFoundError,
@@ -26,6 +28,10 @@ class UserServiceImpl(UserService):
         self.session = session
 
     async def create(self, data: UserCreate) -> User:
+        hashed_password = await run_in_threadpool(
+            hash_password,
+            data.password,
+        )
         try:
             async with self.session.begin():
                 existing = await self.repository.find_by_email(
@@ -40,7 +46,7 @@ class UserServiceImpl(UserService):
                 user = User(
                     name=data.name,
                     email=data.email,
-                    password=hash_password(data.password)
+                    password=hashed_password
                 )
 
                 await self.repository.save(user)

@@ -3,11 +3,6 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
-"""----auth--- """
-from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import func, select
-from app.auth import create_access_token, hash_password, oauth2_schema, verify_access_token, verify_password
-"""----auth--- """
 from app.dependencies import get_user_service
 from app.schemas.user import (
     UserCreate,
@@ -41,10 +36,6 @@ async def create_user(
     service: ServiceDep,
 ):
     return await service.create(data)
-
-@router.post(
-
-)
 
 @router.get(
     "",

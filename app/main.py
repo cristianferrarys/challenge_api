@@ -4,6 +4,15 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.api.users import router as users_router
+
+
+from app.api.auth import router as auth_router
+
+from app.core.exceptions import (
+    InvalidCredentialsError,
+    InvalidAccessTokenError,
+)
+
 from app.core.database import Base, engine
 from app.core.exceptions import (
     UserAlreadyExistsError,
@@ -65,4 +74,21 @@ async def value_error_handler(
     )
 
 
+@app.exception_handler(InvalidCredentialsError)
+@app.exception_handler(InvalidAccessTokenError)
+async def authentication_error_handler(
+    request: Request,
+    exc: Exception,
+):
+
+    return JSONResponse(
+        status_code=401,
+        content={"detail": str(exc)},
+        headers={
+            "WWW-Authenticate": "Bearer"
+        },
+    )
+
+
+app.include_router(auth_router)
 app.include_router(users_router)
