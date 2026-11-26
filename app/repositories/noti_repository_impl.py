@@ -29,6 +29,21 @@ class NotiRepositoryImpl(NotiRepository):
 
         return noti
 
+    async def get_by_user_id(
+        self,
+        user_id: UUID,
+    ) -> list[Notification]:
+        stmt = (
+            select(Notification)
+            .where(Notification.user_id == user_id)
+            .order_by(Notification.created_at.desc())
+        )
+
+        result = await self.session.execute(stmt)
+
+        return list(result.scalars().all())
+
+
     async def delete(self, noti: Notification) -> None:
         await self.session.delete(noti)
         await self.session.flush()

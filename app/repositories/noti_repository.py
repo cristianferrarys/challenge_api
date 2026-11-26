@@ -14,5 +14,11 @@ class NotiRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_by_user_id(
+        self,
+        user_id: UUID,
+    ) -> list[Notification]:
+        pass
+    @abstractmethod
     async def delete(self, notification: Notification) -> None:
         pass

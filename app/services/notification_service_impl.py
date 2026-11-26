@@ -27,13 +27,14 @@ class NotificationServiceImpl(NotificationService):
         self.repository = repository
         self.session = session
 
-    async def create(self, data: NotiCreate) -> Notification:
+    async def create(self, data: NotiCreate, user_id: UUID) -> Notification:
         try:
             async with self.session.begin():
                 notification = Notification(
                     titulo=data.titulo,
                     contenido=data.contenido,
                     canal=data.canal,
+                    user_id=user_id,
                 )
 
                 await self.repository.save(notification)
@@ -95,6 +96,13 @@ class NotificationServiceImpl(NotificationService):
             raise UserAlreadyExistsError(
                 "Error cambios "
             ) from exc
+
+    async def get_my_notifications(
+        self,
+        user_id: UUID,
+    ) -> list[Notification]:
+        return await self.repository.get_by_user_id(user_id)
+
 
     async def delete(self, noti_id: UUID) -> None:
         async with self.session.begin():
