@@ -15,6 +15,10 @@ from app.services.auth_service_impl import AuthServiceImpl
 from app.core.database import SessionLocal
 from app.models.user import User
 """auth"""
+from app.repositories.noti_repository import NotiRepository
+from app.repositories.noti_repository_impl import NotiRepositoryImpl
+from app.services.notification_service import NotificationService
+from app.services.notification_service_impl import NotificationServiceImpl
 
 def get_user_repository(
     session: Annotated[AsyncSession, Depends(get_db)],
@@ -38,7 +42,26 @@ def get_user_service(
     )
 
 
+def get_noti_repository(
+    session: Annotated[AsyncSession, Depends(get_db)],
+) -> NotiRepository:
+    return NotiRepositoryImpl(session)
 
+
+def get_noti_service(
+    repository: Annotated[
+        NotiRepository,
+        Depends(get_noti_repository),
+    ],
+    session: Annotated[
+        AsyncSession,
+        Depends(get_db),
+    ],
+) -> NotificationService:
+    return NotificationServiceImpl(
+        repository=repository,
+        session=session,
+    )
 
 
 def get_auth_service(

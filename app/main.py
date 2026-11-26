@@ -4,9 +4,12 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.api.users import router as users_router
-
-
 from app.api.auth import router as auth_router
+
+from app.api.notifications import router as noti_router
+
+
+
 
 from app.core.exceptions import (
     InvalidCredentialsError,
@@ -92,3 +95,4 @@ async def authentication_error_handler(
 
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(noti_router)
