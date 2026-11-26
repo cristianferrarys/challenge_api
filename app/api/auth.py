@@ -33,7 +33,6 @@ async def login(
     ],
     service: CurrentUserDep,
 ):
-
     return await service.login(
         email=form.username,
         password=form.password,

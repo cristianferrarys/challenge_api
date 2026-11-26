@@ -10,9 +10,8 @@ from app.schemas.user import (
     UserUpdate,
 
 )
-
-
 from app.services.user_service import UserService
+from app.dependencies import get_current_user
 
 
 router = APIRouter(
@@ -40,6 +39,7 @@ async def create_user(
 @router.get(
     "",
     response_model=list[UserResponse],
+    dependencies=[Depends(get_current_user)],
 )
 async def list_users(service: ServiceDep):
     return await service.get_all()
@@ -48,6 +48,7 @@ async def list_users(service: ServiceDep):
 @router.get(
     "/{user_id}",
     response_model=UserResponse,
+    dependencies=[Depends(get_current_user)],
 )
 async def get_user(
     user_id: UUID,
@@ -59,6 +60,7 @@ async def get_user(
 @router.put(
     "/{user_id}",
     response_model=UserResponse,
+    dependencies=[Depends(get_current_user)],
 )
 async def update_user(
     user_id: UUID,
@@ -71,6 +73,7 @@ async def update_user(
 @router.delete(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(get_current_user)],
 )
 async def delete_user(
     user_id: UUID,

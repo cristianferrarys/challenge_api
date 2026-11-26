@@ -39,9 +39,7 @@ def get_user_service(
 
 
 
-oauth2_schema = OAuth2PasswordBearer(
-    tokenUrl="auth/token"
-)
+
 
 def get_auth_service(
     repository: Annotated[
@@ -54,7 +52,9 @@ def get_auth_service(
         repository=repository
     )
 
-
+oauth2_schema = OAuth2PasswordBearer(
+    tokenUrl="auth/token"
+)
 async def get_current_user(
     token: Annotated[
         str,
