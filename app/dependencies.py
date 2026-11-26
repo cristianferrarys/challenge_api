@@ -20,6 +20,12 @@ from app.repositories.noti_repository_impl import NotiRepositoryImpl
 from app.services.notification_service import NotificationService
 from app.services.notification_service_impl import NotificationServiceImpl
 
+
+"""stragia """
+from app.strategies.email_strategy import EmailStrategy
+from app.strategies.sms_strategy import SMSStrategy
+from app.strategies.strategy_registry import StrategyRegistry
+"""stragia """
 def get_user_repository(
     session: Annotated[AsyncSession, Depends(get_db)],
 ) -> UserRepository:
@@ -41,7 +47,13 @@ def get_user_service(
         session=session,
     )
 
-
+def get_strategy_registry() -> StrategyRegistry:
+    return StrategyRegistry(
+        strategies=[
+            EmailStrategy(),
+            SMSStrategy(),
+        ]
+    )
 def get_noti_repository(
     session: Annotated[AsyncSession, Depends(get_db)],
 ) -> NotiRepository:
@@ -57,10 +69,15 @@ def get_noti_service(
         AsyncSession,
         Depends(get_db),
     ],
+    registry: Annotated[
+        StrategyRegistry,
+        Depends(get_strategy_registry),
+    ],
 ) -> NotificationService:
     return NotificationServiceImpl(
         repository=repository,
         session=session,
+        registry=registry,
     )
 
 
@@ -84,12 +101,9 @@ async def get_current_user(
         Depends(oauth2_schema),
     ],
 ) -> User:
-
     async with SessionLocal() as session:
-
         repository = UserRepositoryImpl(session)
-
         service = AuthServiceImpl(repository)
-
         return await service.get_current_user(token)
+
 

@@ -14,8 +14,11 @@ from app.repositories.noti_repository import NotiRepository
 from app.schemas.notification import NotiCreate, NotiUpdate, NotiResponse
 from app.services.notification_service import NotificationService
 
-from app.auth import hash_password
-
+"""implementando estrategia """
+from app.strategies.strategy_registry import (
+    StrategyRegistry,
+)
+"""implementando estrategia """
 
 class NotificationServiceImpl(NotificationService):
 
@@ -23,22 +26,31 @@ class NotificationServiceImpl(NotificationService):
         self,
         repository: NotiRepository,
         session: AsyncSession,
+        registry: StrategyRegistry,
     ):
         self.repository = repository
         self.session = session
+        self.registry= registry
 
     async def create(self, data: NotiCreate, user_id: UUID) -> Notification:
+
+        print(data.canal)
+        print(data.canal.name)
+        print(data.canal.value)
+        strategy = self.registry.get_strategy(data.canal.value)
+
         try:
             async with self.session.begin():
                 notification = Notification(
                     titulo=data.titulo,
                     contenido=data.contenido,
-                    canal=data.canal,
+                    canal=strategy.channel,
+                    destinatario=data.destinatario,
                     user_id=user_id,
                 )
 
                 await self.repository.save(notification)
-
+                await strategy.send(notification)
             return notification
 
         except IntegrityError as exc:

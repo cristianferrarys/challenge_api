@@ -1,11 +1,14 @@
 import uuid
+
+
 from datetime import datetime
 from sqlalchemy import DateTime, func, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
-
+from sqlalchemy import Enum as SQLEnum
+from app.enums.notification_channel import NotificationChannel
 
 class Notification(Base):
     __tablename__ = "notifications"
@@ -26,8 +29,12 @@ class Notification(Base):
         nullable=False,
     )
 
-    canal: Mapped[str] = mapped_column(
-        String(200),
+    canal: Mapped[NotificationChannel] = mapped_column(
+        SQLEnum(
+            NotificationChannel,
+            name="notification_channel",
+            values_callable=lambda enum: [item.value for item in enum],
+        ),
         nullable=False,
     )
 
@@ -39,6 +46,11 @@ class Notification(Base):
         ),
         nullable=False,
         index=True,
+    )
+
+    destinatario: Mapped[str] = mapped_column(
+        String(512),
+        nullable=False
     )
 
     created_at: Mapped[datetime] = mapped_column(
