@@ -9,7 +9,12 @@ from app.api.auth import router as auth_router
 from app.api.notifications import router as noti_router
 
 
+import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+)
 
 from app.core.exceptions import (
     InvalidCredentialsError,

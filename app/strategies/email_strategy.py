@@ -38,7 +38,10 @@ class EmailStrategy(NotificationStrategy):
             f"<h1>{notification.titulo}</h1>"
             f"<p>{notification.contenido}</p>"
         )
-
+        logger.info(
+            "template: %s",
+            template,
+        )
         logger.info(
             "Email simulated: notification_id=%s",
             notification.id,
