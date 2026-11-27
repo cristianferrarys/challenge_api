@@ -1,0 +1,19 @@
+[run]
+source = app
+branch = True
+
+[report]
+show_missing = True
+precision = 2
+
+exclude_lines =
+    pragma: no cover
+    @abstractmethod
+    if TYPE_CHECKING:
+    if __name__ == .__main__.:
+
+[html]
+directory = htmlcov
+
+[xml]
+output = coverage.xml
