@@ -1,6 +1,7 @@
 from app.strategies.notification_strategy import (
     NotificationStrategy,
 )
+from app.core.exceptions import InvalidRecipientError
 
 class StrategyRegistry:
     def __init__(
@@ -22,6 +23,6 @@ class StrategyRegistry:
         )
 
         if strategy is None:
-            raise ValueError(f"Unsupported channel: {channel}")
+            raise InvalidRecipientError(f"Unsupported channel: {channel}")
 
         return strategy

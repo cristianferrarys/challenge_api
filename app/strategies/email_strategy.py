@@ -4,7 +4,7 @@ from email_validator import (
     validate_email,
     EmailNotValidError,
 )
-
+from app.core.exceptions import InvalidRecipientError
 from app.models.notification import Notification
 from app.strategies.notification_strategy import (
     NotificationStrategy,
@@ -30,7 +30,7 @@ class EmailStrategy(NotificationStrategy):
                 check_deliverability=False,
             )
         except EmailNotValidError as exc:
-            raise ValueError(
+            raise InvalidRecipientError(
                 "Invalid email recipient"
             ) from exc
 

@@ -93,7 +93,7 @@ class NotificationServiceImpl(NotificationService):
 
                 for field, value in changes.items():
                     if value is None:
-                        raise ValueError(f"{field} no puede ser null")
+                        raise UserAlreadyExistsError(f"{field} no puede ser null")
                     setattr(noti, field, value)
 
                 await self.repository.save(noti)

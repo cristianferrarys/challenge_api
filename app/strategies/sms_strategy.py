@@ -5,6 +5,7 @@ from app.models.notification import Notification
 from app.strategies.notification_strategy import (
     NotificationStrategy,
 )
+from app.core.exceptions import InvalidRecipientError
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +24,10 @@ class SMSStrategy(NotificationStrategy):
             r"\+[1-9]\d{7,14}",
             notification.destinatario,
         ):
-            raise ValueError("Numero invalido")
+            raise InvalidRecipientError("Numero invalido")
 
         if len(notification.contenido) > 160:
-            raise ValueError(
+            raise InvalidRecipientError(
                 "SMS tiene mas de  160 characteres"
             )
 

@@ -2,6 +2,7 @@ import logging
 import re
 
 from app.models.notification import Notification
+from app.core.exceptions import InvalidRecipientError
 from app.strategies.notification_strategy import (
     NotificationStrategy,
 )
@@ -24,7 +25,7 @@ class PushStrategy(NotificationStrategy):
             r"[A-Za-z0-9_:\-]{20,512}",
             token,
         ):
-            raise ValueError("Invalid device token")
+            raise InvalidRecipientError("Invalid device token")
 
         payload = {
             "token": token,

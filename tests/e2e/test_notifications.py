@@ -130,3 +130,31 @@ async def test_notification_not_found(client, mocker):
     spy.assert_awaited_once()
 
 """test con mock db template """
+
+async def test_notification_update_ok(client, mocker):
+
+    headers = await authenticate(client)
+    notification_id = uuid4()
+    notification = Notification(
+        id=notification_id,
+        titulo="Notificación simulada",
+        contenido="Contenido simulado",
+        canal="email",
+        destinatario="test@example.com",
+    )
+    # Mock de la respuesta del repositorio
+    spy = mocker.patch.object(
+        NotiRepositoryImpl,
+        "save",
+        return_value=None,
+    )
+
+    # Ejecutar endpoint
+    response = await client.get(
+        f"/notifications/{notification_id}",
+        headers=headers,
+    )
+    # Validar respuesta HTTP
+    assert response.status_code == 404
+    # Validar llamada al repositorio
+    spy.assert_awaited_once()
