@@ -24,6 +24,7 @@ from app.services.notification_service_impl import NotificationServiceImpl
 """stragia """
 from app.strategies.email_strategy import EmailStrategy
 from app.strategies.sms_strategy import SMSStrategy
+from app.strategies.push_strategy import PushStrategy
 from app.strategies.strategy_registry import StrategyRegistry
 """stragia """
 def get_user_repository(
@@ -52,6 +53,7 @@ def get_strategy_registry() -> StrategyRegistry:
         strategies=[
             EmailStrategy(),
             SMSStrategy(),
+            PushStrategy(),
         ]
     )
 def get_noti_repository(

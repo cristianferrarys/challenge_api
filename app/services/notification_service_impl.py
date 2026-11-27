@@ -50,11 +50,7 @@ class NotificationServiceImpl(NotificationService):
 
     async def create(self, data: NotiCreate, user_id: UUID) -> Notification:
 
-        print(data.canal)
-        print(data.canal.name)
-        print(data.canal.value)
         strategy = self.registry.get_strategy(data.canal.value)
-
         try:
             async with self.session.begin():
                 notification = Notification(

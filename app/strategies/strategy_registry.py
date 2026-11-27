@@ -22,8 +22,6 @@ class StrategyRegistry:
         )
 
         if strategy is None:
-            raise ValueError(
-                f"Unsupported channel: {channel}"
-            )
+            raise ValueError(f"Unsupported channel: {channel}")
 
         return strategy
