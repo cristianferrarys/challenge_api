@@ -1,6 +1,6 @@
-venv
-.env
 .env.test
+.env
+venv
 .venv/
 .pytest_cache/
 .coverage
