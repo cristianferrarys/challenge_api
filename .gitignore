@@ -1,5 +1,11 @@
 venv
 .env
+.env.test
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+__pycache__/
 FullStack_Challenge_Notificaciones.pdf
 .idea
-.env.test
+
