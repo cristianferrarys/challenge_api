@@ -38,8 +38,9 @@ class UserServiceImpl(UserService):
                 existing = await self.repository.find_by_email(
                     data.email
                 )
-
+                print(">>> existing:", existing)  # TEMPORAL
                 if existing:
+                    print(">>> ENTRANDO AL RAISE")  # temporal
                     raise UserAlreadyExistsError(
                         "El email ya está registrado"
                     )
@@ -69,9 +70,6 @@ class UserServiceImpl(UserService):
             )
 
         return user
-
-    async def get_all(self) -> list[User]:
-        return await self.repository.find_all()
 
     async def update(
         self,
@@ -109,16 +107,3 @@ class UserServiceImpl(UserService):
             raise UserAlreadyExistsError(
                 "El email ya está registrado"
             ) from exc
-
-    async def delete(self, user_id: UUID) -> None:
-        async with self.session.begin():
-            user = await self.repository.find_by_id(
-                user_id
-            )
-
-            if user is None:
-                raise UserNotFoundError(
-                    "Usuario no encontrado"
-                )
-
-            await self.repository.delete(user)

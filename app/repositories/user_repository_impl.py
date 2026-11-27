@@ -22,20 +22,9 @@ class UserRepositoryImpl(UserRepository):
 
         return result.scalar_one_or_none()
 
-    async def find_all(self) -> list[User]:
-        stmt = select(User).order_by(User.name)
-
-        result = await self.session.execute(stmt)
-
-        return list(result.scalars().all())
-
     async def save(self, user: User) -> User:
         self.session.add(user)
 
         await self.session.flush()
 
         return user
-
-    async def delete(self, user: User) -> None:
-        await self.session.delete(user)
-        await self.session.flush()

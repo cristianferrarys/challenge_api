@@ -22,7 +22,6 @@ async def authenticate(client):
     response = await client.post(
         "/auth/token",
         data={
-            "name": user["name"],
             "username": user["email"],
             "password": user["password"],
         },
