@@ -3,9 +3,12 @@
 venv
 .venv/
 .pytest_cache/
-.coverage
-htmlcov/
 __pycache__/
 FullStack_Challenge_Notificaciones.pdf
 .idea
 
+# Testing
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
