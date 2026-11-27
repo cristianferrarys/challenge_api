@@ -8,6 +8,7 @@ from starlette.concurrency import run_in_threadpool
 from app.core.exceptions import (
     UserAlreadyExistsError,
     UserNotFoundError,
+    InvalidUserDataError,
 )
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
@@ -94,7 +95,7 @@ class UserServiceImpl(UserService):
 
                 for field, value in changes.items():
                     if value is None:
-                        raise ValueError(
+                        raise InvalidUserDataError(
                             f"{field} no puede ser null"
                         )
 

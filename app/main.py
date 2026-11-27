@@ -1,13 +1,17 @@
-from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from app.api.users import router as users_router
 from app.api.auth import router as auth_router
-
 from app.api.notifications import router as noti_router
-
+from app.core.exception_handlers import (
+    register_exception_handlers,
+)
+from app.core.database import Base, engine
+from app.models.user import User  # noqa: F401
+from app.models.notification import Notification  # noqa: F401
 
 import logging
 
@@ -15,21 +19,6 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
 )
-
-from app.core.exceptions import (
-    InvalidCredentialsError,
-    InvalidAccessTokenError,
-)
-
-from app.core.database import Base, engine
-from app.core.exceptions import (
-    UserAlreadyExistsError,
-    UserNotFoundError,
-)
-
-# Importar los modelos para registrar sus tablas.
-from app.models.user import User  # noqa: F401
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -48,56 +37,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Register exception handlers
+register_exception_handlers(app)
 
-@app.exception_handler(UserNotFoundError)
-async def not_found_handler(
-    request: Request,
-    exc: UserNotFoundError,
-):
-    return JSONResponse(
-        status_code=404,
-        content={"detail": str(exc)},
-    )
-
-
-@app.exception_handler(UserAlreadyExistsError)
-async def conflict_handler(
-    request: Request,
-    exc: UserAlreadyExistsError,
-):
-    return JSONResponse(
-        status_code=409,
-        content={"detail": str(exc)},
-    )
-
-
-@app.exception_handler(ValueError)
-async def value_error_handler(
-    request: Request,
-    exc: ValueError,
-):
-    return JSONResponse(
-        status_code=422,
-        content={"detail": str(exc)},
-    )
-
-
-@app.exception_handler(InvalidCredentialsError)
-@app.exception_handler(InvalidAccessTokenError)
-async def authentication_error_handler(
-    request: Request,
-    exc: Exception,
-):
-
-    return JSONResponse(
-        status_code=401,
-        content={"detail": str(exc)},
-        headers={
-            "WWW-Authenticate": "Bearer"
-        },
-    )
-
-
+# Register routers
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(noti_router)
