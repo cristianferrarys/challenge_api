@@ -1,4 +1,5 @@
 from uuid import uuid4
+import copy
 
 from app.models.notification import Notification
 from app.repositories.noti_repository_impl import (
@@ -135,6 +136,7 @@ async def test_notification_update_ok(client, mocker):
 
     headers = await authenticate(client)
     notification_id = uuid4()
+
     notification = Notification(
         id=notification_id,
         titulo="Notificación simulada",
@@ -143,18 +145,38 @@ async def test_notification_update_ok(client, mocker):
         destinatario="test@example.com",
     )
     # Mock de la respuesta del repositorio
-    spy = mocker.patch.object(
+
+    spy_find = mocker.patch.object(
         NotiRepositoryImpl,
-        "save",
-        return_value=None,
+        "find_by_id_and_user_id",
+        return_value=notification,
     )
 
+    spy_save = mocker.patch.object(
+        NotiRepositoryImpl,
+        "save",
+        return_value=notification,
+    )
+
+    notification_update = {
+        "titulo": "Update Notificación simulada",
+        "contenido": "Update Contenido simulado",
+        "canal": "email",
+        "destinatario": "update@example.com",
+    }
+
     # Ejecutar endpoint
-    response = await client.get(
+    response = await client.put(
         f"/notifications/{notification_id}",
         headers=headers,
+        json=notification_update,
     )
     # Validar respuesta HTTP
-    assert response.status_code == 404
+    assert response.status_code == 200
+    data = response.json()
     # Validar llamada al repositorio
-    spy.assert_awaited_once()
+    assert data["titulo"] == notification_update["titulo"]
+    assert data["contenido"] == notification_update["contenido"]
+    assert data["destinatario"] == notification_update["destinatario"]
+    spy_find.assert_awaited_once()
+    spy_save.assert_awaited_once_with(notification)
