@@ -3,15 +3,22 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
-from app.dependencies import get_user_service
+from app.dependencies import (
+    get_user_service,
+    get_current_user,
+)
+
+from app.models.user import User
+
 from app.schemas.user import (
     UserCreate,
     UserResponse,
     UserUpdate,
-
 )
+
 from app.services.user_service import UserService
-from app.dependencies import get_current_user
+
+
 
 
 router = APIRouter(
@@ -24,6 +31,10 @@ ServiceDep = Annotated[
     Depends(get_user_service),
 ]
 
+UserDep = Annotated[
+    User,
+    Depends(get_current_user),
+]
 
 @router.post(
     "",
@@ -37,30 +48,16 @@ async def create_user(
     return await service.create(data)
 
 @router.get(
-    "",
-    response_model=list[UserResponse],
-    dependencies=[Depends(get_current_user)],
-)
-async def list_users(service: ServiceDep):
-    return await service.get_all()
-
-
-@router.get(
-    "/{user_id}",
+    "/me",
     response_model=UserResponse,
-    dependencies=[Depends(get_current_user)],
 )
-async def get_user(
-    user_id: UUID,
-    service: ServiceDep,
-):
-    return await service.get_by_id(user_id)
+async def get_user(auth_user: UserDep):
+    return auth_user
 
 
-@router.put(
-    "/{user_id}",
+@router.patch(
+    "/me",
     response_model=UserResponse,
-    dependencies=[Depends(get_current_user)],
 )
 async def update_user(
     user_id: UUID,
@@ -69,14 +66,3 @@ async def update_user(
 ):
     return await service.update(user_id, data)
 
-
-@router.delete(
-    "/{user_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(get_current_user)],
-)
-async def delete_user(
-    user_id: UUID,
-    service: ServiceDep,
-):
-    await service.delete(user_id)
