@@ -55,7 +55,7 @@ async def get_noti(
     service: ServiceDep,
     auth_user: UserDep,
 ):
-    return await service.get_by_id(noti_id=noti_id, auth_user=auth_user.id)
+    return await service.get_by_id(noti_id=noti_id, user_id=auth_user.id)
 
 
 @router.put(
