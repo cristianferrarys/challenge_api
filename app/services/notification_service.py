@@ -5,20 +5,18 @@ from app.schemas.notification import NotiCreate, NotiUpdate,NotiResponse
 
 class NotificationService(ABC):
     @abstractmethod
-    async def create(self, data: NotiCreate, user_id: UUID) -> Notification:
-        pass
-    @abstractmethod
-    async def get_by_id(self, user_id: UUID) -> NotiResponse:
-        pass
-    @abstractmethod
-    async def get_all(self) -> list[Notification]:
+    async def create(
+        self,
+        data: NotiCreate,
+        user_id: UUID,
+    ) -> Notification:
         pass
 
     @abstractmethod
-    async def update(
+    async def get_by_id(
         self,
+        noti_id: UUID,
         user_id: UUID,
-        data: NotiUpdate,
     ) -> Notification:
         pass
 
@@ -28,6 +26,20 @@ class NotificationService(ABC):
         user_id: UUID,
     ) -> list[Notification]:
         pass
+
     @abstractmethod
-    async def delete(self, noti_id: UUID) -> None:
+    async def update(
+        self,
+        noti_id: UUID,
+        user_id: UUID,
+        data: NotiUpdate,
+    ) -> Notification:
+        pass
+
+    @abstractmethod
+    async def delete(
+        self,
+        noti_id: UUID,
+        user_id: UUID,
+    ) -> None:
         pass

@@ -8,10 +8,9 @@ from app.schemas.notification import (
     NotiCreate,
     NotiUpdate,
     NotiResponse,
-
 )
 from app.services.notification_service import NotificationService
-from app.services.auth_service import AuthService
+from app.models.user import User
 
 router = APIRouter(
     prefix="/notifications",
@@ -24,7 +23,7 @@ ServiceDep = Annotated[
 ]
 
 UserDep = Annotated[
-    AuthService,
+    User,
     Depends(get_current_user),
 ]
 
@@ -32,7 +31,6 @@ UserDep = Annotated[
     "",
     response_model=NotiResponse,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(get_current_user)],
 )
 async def create_noti(
     data: NotiCreate,
@@ -45,19 +43,7 @@ async def create_noti(
     "",
     response_model=list[NotiResponse],
 )
-async def list_noti(service: ServiceDep):
-    return await service.get_all()
-
-@router.get(
-    "/me",
-    response_model=list[NotiResponse],
-    dependencies=[Depends(get_current_user)],
-)
-async def get_my_notifications(
-    service: ServiceDep,
-    auth_user: UserDep,
-):
-    print(f'servicoio  {auth_user}')
+async def list_noti(service: ServiceDep,auth_user: UserDep,):
     return await service.get_my_notifications(auth_user.id)
 
 @router.get(
@@ -67,20 +53,9 @@ async def get_my_notifications(
 async def get_noti(
     noti_id: UUID,
     service: ServiceDep,
-):
-    return await service.get_by_id(noti_id)
-
-@router.get(
-    "/me",
-    response_model=list[NotiResponse],
-    dependencies=[Depends(get_current_user)],
-)
-async def get_my_notifications(
-    service: ServiceDep,
     auth_user: UserDep,
 ):
-    print(f'servicoio  {auth_user}')
-    return await service.get_my_notifications(auth_user.id)
+    return await service.get_by_id(noti_id=noti_id, auth_user=auth_user.id)
 
 
 @router.put(
@@ -91,8 +66,9 @@ async def update_noti(
     noti_id: UUID,
     data: NotiUpdate,
     service: ServiceDep,
+    auth_user: UserDep,
 ):
-    return await service.update(noti_id, data)
+    return await service.update(noti_id=noti_id, data=data,user_id=auth_user.id)
 
 
 @router.delete(
@@ -102,5 +78,6 @@ async def update_noti(
 async def delete_noti(
     noti_id: UUID,
     service: ServiceDep,
+    auth_user: UserDep,
 ):
-    await service.delete(noti_id)
+    await service.delete(noti_id=noti_id, user_id=auth_user.id)

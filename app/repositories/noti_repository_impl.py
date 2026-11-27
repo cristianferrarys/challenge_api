@@ -1,3 +1,4 @@
+
 from uuid import UUID
 
 from sqlalchemy import select
@@ -8,23 +9,29 @@ from app.repositories.noti_repository import NotiRepository
 
 
 class NotiRepositoryImpl(NotiRepository):
-
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def find_by_id(self, noti_id: UUID) -> Notification | None:
-        return await self.session.get(Notification, noti_id)
+    async def find_by_id_and_user_id(
+        self,
+        noti_id: UUID,
+        user_id: UUID,
+    ) -> Notification | None:
 
-    async def find_all(self) -> list[Notification]:
-        stmt = select(Notification).order_by(Notification.id)
+        stmt = select(Notification).where(
+            Notification.id == noti_id,
+            Notification.user_id == user_id,
+        )
 
         result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
 
-        return list(result.scalars().all())
+    async def save(
+        self,
+        noti: Notification,
+    ) -> Notification:
 
-    async def save(self, noti: Notification) -> Notification:
         self.session.add(noti)
-
         await self.session.flush()
 
         return noti
@@ -33,6 +40,7 @@ class NotiRepositoryImpl(NotiRepository):
         self,
         user_id: UUID,
     ) -> list[Notification]:
+
         stmt = (
             select(Notification)
             .where(Notification.user_id == user_id)
@@ -43,7 +51,10 @@ class NotiRepositoryImpl(NotiRepository):
 
         return list(result.scalars().all())
 
+    async def delete(
+        self,
+        noti: Notification,
+    ) -> None:
 
-    async def delete(self, noti: Notification) -> None:
         await self.session.delete(noti)
         await self.session.flush()
