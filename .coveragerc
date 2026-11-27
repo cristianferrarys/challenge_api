@@ -1,7 +1,9 @@
 [run]
 source = app
 branch = True
-
+concurrency =
+    greenlet
+    thread
 [report]
 show_missing = True
 precision = 2
