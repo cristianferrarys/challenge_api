@@ -11,15 +11,16 @@ class NotiCreate(BaseModel):
 
 
 class NotiUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     titulo: str = Field(min_length=2, max_length=100)
     contenido: str = Field(min_length=2, max_length=200)
-    canal: str = Field(min_length=6, max_length=200)
-
+    canal: NotificationChannel | None = None
+    destinatario: str = Field(min_length=2, max_length=100)
 
 class NotiResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: uuid.UUID
     titulo: str
     contenido: str
-    canal: str
+    canal: NotificationChannel
     destinatario: str
